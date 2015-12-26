@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Hotels</string>
+    <string name="action_sort">Sort</string>
+    <string name="internet_conn_err">Internet connection error. Please, try again later</string>
+    <string name="title_activity_select_hotel">SelectHotelActivity</string>
+
+    <string name="sort_by_distance">By distance from center</string>
+    <string name="sort_by_countOfAvailableRooms">By count of available suites</string>
+
+    <string name="hotel_name">Name: </string>
+    <string name="hotel_address">Address: </string>
+    <string name="hotel_stars">Stars: </string>
+    <string name="hotel_distance">Distance from center: </string>
+    <string name="hotel_suites">Count of available suites: </string>
+    <string name="hotel_lat">lat: </string>
+    <string name="hotel_lon">lon: </string>
+
+
+    <string name="key_id">ID</string>
+    <string name="key_name">NAME</string>
+    <string name="key_adress">ADRESS</string>
+    <string name="key_stars">STARS</string>
+    <string name="key_distance">DISTANCE</string>
+    <string name="key_suites">SUITES</string>
+    <string name="key_img">IMG</string>
+    <string name="key_lat">LAT</string>
+    <string name="key_lon">LON</string>
+</resources>

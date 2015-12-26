@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_select_hotel"
+    tools:context="com.example.dan.hotels.SelectHotelActivity">
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarSelected"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/internet_conn_err"
+        android:id="@+id/textViewErr"
+        android:layout_gravity="center_horizontal" />
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView"
+        android:scrollbars="none"
+        android:visibility="visible">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linearLayoutSelected"
+            android:orientation="vertical"
+            android:paddingBottom="5dp"
+            android:visibility="invisible">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageViewHotel"
+                android:scaleType="fitXY"
+                android:paddingLeft="-50dp"
+                android:paddingTop="-50dp"
+                android:paddingRight="-50dp"
+                android:paddingBottom="-50dp"
+                android:layout_gravity="center_horizontal" />
+
+            <TextView
+                android:id="@+id/textView_nameSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_name"
+                android:textSize="24sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+
+            <TextView
+                android:id="@+id/textView_addressSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_address"
+                android:textSize="14sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+            <TextView
+                android:id="@+id/textView_starsSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_stars"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+            <TextView
+                android:id="@+id/textView_distanceSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_distance"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+            <TextView
+                android:id="@+id/textView_suitesSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_suites"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+            <TextView
+                android:id="@+id/textView_latSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_lat"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+            <TextView
+                android:id="@+id/textView_lonSelected"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hotel_lon"
+                android:textSize="14sp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
