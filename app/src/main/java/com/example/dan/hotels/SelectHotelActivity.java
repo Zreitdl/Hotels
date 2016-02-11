@@ -34,14 +34,15 @@ public class SelectHotelActivity extends AppCompatActivity {
     private static final String HOTELS_FOLDER_URL =
             "https://dl.dropboxusercontent.com/u/109052005/1/";
 
-    Bitmap hotelImg = null;
+    private Bitmap hotelImg = null;
     private long selectedHotelID;
-    Hotel selectedHotel = null;
-    ProgressBar progressBarView;
+    private Hotel selectedHotel = null;
+    private ProgressBar progressBarView;
     // Выполняющийся таск загрузки файла
-    private JSONDownloadTask downloadTask;;
-    TextView textViewErr;
-    LinearLayout linearLayoutData;
+    private JSONDownloadTask downloadTask;
+    private DownloadImageTask downloadImageTask;
+    private TextView textViewErr;
+    private LinearLayout linearLayoutData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class SelectHotelActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             downloadTask = (SelectHotelActivity.JSONDownloadTask) getLastCustomNonConfigurationInstance();
+            downloadImageTask = (SelectHotelActivity.DownloadImageTask) getLastCustomNonConfigurationInstance();
             selectedHotel = savedInstanceState.getParcelable("hotel");
             hotelImg = savedInstanceState.getParcelable("img");
         }
@@ -71,11 +73,13 @@ public class SelectHotelActivity extends AppCompatActivity {
         if (selectedHotel == null) {
             // Создаем новый таск
             downloadTask = new JSONDownloadTask(this);
+            downloadImageTask = new DownloadImageTask(this);
             downloadTask.execute();
         } else {
             //Log.d(TAG, "Get task");
             // Передаем в ранее запущенный таск текущий объект Activity
             downloadTask.attachActivity(this);
+            downloadImageTask.attachActivity(this);
             if (selectedHotel != null) {
                 inflateActivity(selectedHotel);
             } else {
@@ -91,6 +95,7 @@ public class SelectHotelActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         downloadTask.cancel(true);
+        downloadImageTask.cancel(true);
     }
 
     @Override
@@ -110,7 +115,7 @@ public class SelectHotelActivity extends AppCompatActivity {
         //TODO переделать в sharedpreferences, картинку в отдельный файл
     }
 
-    public class JSONDownloadTask extends AsyncTask<Void, Void, Boolean> {
+    public static class JSONDownloadTask extends AsyncTask<Void, Void, Boolean> {
         // Текущий объект Activity, храним для обновления отображения
         private SelectHotelActivity activity;
         private Boolean successful;
@@ -137,7 +142,7 @@ public class SelectHotelActivity extends AppCompatActivity {
             successful = true;
             try {
                 JSONHotelsParseUtils parseUtils = new JSONHotelsParseUtils();
-                selectedHotel = parseUtils.readJSONStream(HOTELS_FOLDER_URL + selectedHotelID + ".json", true).get(0);
+                activity.selectedHotel = parseUtils.readJSONStream(HOTELS_FOLDER_URL + activity.selectedHotelID + ".json", true).get(0);
                 Log.d(TAG, "Parce successful");
 
             } catch (Exception e) {
@@ -152,13 +157,13 @@ public class SelectHotelActivity extends AppCompatActivity {
             // Log.d(TAG, "successful: " + successful);
             if (successful) {
                 Log.d(TAG, "Successful obtaining hotel");
-                DownloadImageTask downloadImageTask = new DownloadImageTask ();
-                downloadImageTask.execute(HOTELS_FOLDER_URL + selectedHotel.imgFile);
+                DownloadImageTask downloadImageTask = new DownloadImageTask(activity);
+                downloadImageTask.execute(HOTELS_FOLDER_URL + activity.selectedHotel.imgFile);
             } else {
                 //TODO добавить кнопку "Try again", при нажатии на неё запускать новый таск, закрывать старый
-                progressBarView.setVisibility(View.INVISIBLE);
-                textViewErr.setVisibility(View.VISIBLE);
-                textViewErr.setText(R.string.internet_conn_err);
+                activity.progressBarView.setVisibility(View.INVISIBLE);
+                activity.textViewErr.setVisibility(View.VISIBLE);
+                activity.textViewErr.setText(R.string.internet_conn_err);
             }
         }
     }
@@ -208,10 +213,16 @@ public class SelectHotelActivity extends AppCompatActivity {
         linearLayoutData.setVisibility(View.VISIBLE);
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        private SelectHotelActivity activity;
 
-        public DownloadImageTask() {
+        public DownloadImageTask(SelectHotelActivity activity) {
+            this.activity = activity;
+        }
 
+        void attachActivity(SelectHotelActivity activity) {
+            this.activity = activity;
+            //updateView();
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -231,9 +242,9 @@ public class SelectHotelActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap result) {
             if (result != null) {
                 result = Bitmap.createBitmap(result, 2, 2, result.getWidth() - 2, result.getHeight() - 5);
-                hotelImg = result;
+                activity.hotelImg = result;
             }
-            inflateActivity(selectedHotel);
+            activity.inflateActivity(activity.selectedHotel);
         }
     }
 

@@ -1,14 +1,14 @@
 package com.example.dan.hotels;
 
 /*      TODO
-        Утечки памяти при использовании AsyncTask
+        (!) Утечки памяти - fised
         При повороте экрана пропадает диалог выбора сортировки
         По кол-ву свободных мест отели следовало сортировать в убывающем порядке
-        При клике на меню каждый раз создаётся диалог сортировки (у Activity есть методы showDialog/onCreateDialog)
+        (!)При клике на меню каждый раз создаётся диалог сортировки (у Activity есть методы showDialog/onCreateDialog) - fixed
         При сортировке пересоздаётся SimpleAdapter
         CoordinatorLayout используется без необходимости
         Подсчёт кол-ва свободных мест - ненадёжно и неинтуитивно
-        Незнание сторонних библиотек для работы с сетью */
+        Использование сторонних библиотек (?)*/
 
 
 
@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class HotelsListActivity extends AppCompatActivity {
+    //идентификатор диалога сортировки
+    private final int SORT_DIALOG_ID = 0;
 
     //url для скачивания списка отелей в формате json
     private static final String HOTELS_LIST_JSON_URL =
@@ -140,7 +142,7 @@ public class HotelsListActivity extends AppCompatActivity {
         hotels = savedInstanceState.getParcelableArrayList("hotels");
     }
 
-    public class JSONDownloadTask extends AsyncTask<Void, Void, Boolean> {
+    public static class JSONDownloadTask extends AsyncTask<Void, Void, Boolean> {
         // Текущий объект Activity, храним для обновления отображения
         private HotelsListActivity activity;
         private Boolean successful;
@@ -167,7 +169,7 @@ public class HotelsListActivity extends AppCompatActivity {
             successful = true;
             try {
                 JSONHotelsParseUtils parseUtils = new JSONHotelsParseUtils();
-                hotels = parseUtils.readJSONStream(HOTELS_LIST_JSON_URL, false);
+                activity.hotels = parseUtils.readJSONStream(HOTELS_LIST_JSON_URL, false);
                 Log.d(TAG, "Parce successful");
 
             } catch (Exception e) {
@@ -181,14 +183,14 @@ public class HotelsListActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean successful) {
            // Log.d(TAG, "successful: " + successful);
             if (successful) {
-                inflateListView(hotels);
+                activity.inflateListView(activity.hotels);
                 Log.d(TAG, "Successful obtaining array of hotels");
 
             } else {
                 //TODO добавить кнопку "Try again", при нажатии на неё запускать новый таск, закрывать старый
-                progressBarView.setVisibility(View.INVISIBLE);
-                textView.setVisibility(View.VISIBLE);
-                textView.setText(R.string.internet_conn_err);
+                activity.progressBarView.setVisibility(View.INVISIBLE);
+                activity.textView.setVisibility(View.VISIBLE);
+                activity.textView.setText(R.string.internet_conn_err);
             }
         }
     }
@@ -284,9 +286,9 @@ public class HotelsListActivity extends AppCompatActivity {
             if (count1 == count2) {
                 return 0;
             } else if (count1 < count2) {
-                return -1;
-            } else {
                 return 1;
+            } else {
+                return -1;
             }
         }
     }
@@ -307,40 +309,47 @@ public class HotelsListActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            sortDialog().show();
+            //sortDialog().show();
+            this.showDialog(SORT_DIALOG_ID);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public Dialog sortDialog() {
-        final String[] sortNamesArray = {getString(R.string.sort_by_distance),
-                getString(R.string.sort_by_countOfAvailableRooms)};
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case SORT_DIALOG_ID:
+                final String[] sortNamesArray = {getString(R.string.sort_by_distance),
+                        getString(R.string.sort_by_countOfAvailableRooms)};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(HotelsListActivity.this);
-        builder.setTitle(getString(R.string.action_sort))
-                .setItems(sortNamesArray, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //если сортировка поменялась, то перезагрузить ListView и обновить сортировку
-                        if (sortNamesArray[which].equals(getString(R.string.sort_by_distance))) {
-                            if (sortBy != SortBy.distance) {
-                                sortBy = SortBy.distance;
-                                if (hotels != null) {
-                                    inflateListView(hotels);
+                AlertDialog.Builder builder = new AlertDialog.Builder(HotelsListActivity.this);
+                builder.setTitle(getString(R.string.action_sort))
+                        .setItems(sortNamesArray, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                //если сортировка поменялась, то перезагрузить ListView и обновить сортировку
+                                if (sortNamesArray[which].equals(getString(R.string.sort_by_distance))) {
+                                    if (sortBy != SortBy.distance) {
+                                        sortBy = SortBy.distance;
+                                        if (hotels != null) {
+                                            inflateListView(hotels);
+                                        }
+                                    }
+                                } else if (sortNamesArray[which].equals(getString(R.string.sort_by_countOfAvailableRooms))) {
+                                    if (sortBy != SortBy.countOfAviableRooms) {
+                                        sortBy = SortBy.countOfAviableRooms;
+                                        if (hotels != null) {
+                                            inflateListView(hotels);
+                                        }
+                                    }
                                 }
                             }
-                        } else if (sortNamesArray[which].equals(getString(R.string.sort_by_countOfAvailableRooms))) {
-                            if (sortBy != SortBy.countOfAviableRooms) {
-                                sortBy = SortBy.countOfAviableRooms;
-                                if (hotels != null) {
-                                    inflateListView(hotels);
-                                }
-                            }
-                        }
-                    }
-                });
-        return builder.create();
+                        });
+                return builder.create();
+            default:
+                return null;
+        }
+
     }
 
     private static final String TAG = "HotelsList";
