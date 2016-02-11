@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,28 +65,30 @@ public class SelectHotelActivity extends AppCompatActivity {
         linearLayoutData.setVisibility(View.INVISIBLE);
 
         if (savedInstanceState != null) {
-            downloadTask = (SelectHotelActivity.JSONDownloadTask) getLastCustomNonConfigurationInstance();
-            downloadImageTask = (SelectHotelActivity.DownloadImageTask) getLastCustomNonConfigurationInstance();
+            Pair pair = (Pair) getLastCustomNonConfigurationInstance();
+            downloadTask = (SelectHotelActivity.JSONDownloadTask) pair.first;
+            downloadImageTask = (SelectHotelActivity.DownloadImageTask) pair.second;
             selectedHotel = savedInstanceState.getParcelable("hotel");
             hotelImg = savedInstanceState.getParcelable("img");
         }
 
-        if (selectedHotel == null) {
+        if (downloadTask == null) {
             // Создаем новый таск
             downloadTask = new JSONDownloadTask(this);
-            downloadImageTask = new DownloadImageTask(this);
+           // downloadImageTask = new DownloadImageTask(this);
             downloadTask.execute();
         } else {
             //Log.d(TAG, "Get task");
             // Передаем в ранее запущенный таск текущий объект Activity
             downloadTask.attachActivity(this);
-            downloadImageTask.attachActivity(this);
             if (selectedHotel != null) {
                 inflateActivity(selectedHotel);
             } else {
                 Log.e(TAG, "hotel = null in onCreate");
             }
-
+        }
+        if (downloadImageTask != null) {
+            downloadImageTask.attachActivity(this);
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -94,8 +97,12 @@ public class SelectHotelActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        downloadTask.cancel(true);
-        downloadImageTask.cancel(true);
+        if (downloadTask != null) {
+            downloadTask.cancel(true);
+        }
+        if (downloadImageTask != null) {
+            downloadImageTask.cancel(true);
+        }
     }
 
     @Override
@@ -170,7 +177,7 @@ public class SelectHotelActivity extends AppCompatActivity {
     @Override
     public Object onRetainCustomNonConfigurationInstance() {
         // Смена конфигурации экрана
-        return downloadTask;
+        return new Pair(downloadTask, downloadImageTask);
     }
 
     public void inflateActivity(Hotel hotel) {

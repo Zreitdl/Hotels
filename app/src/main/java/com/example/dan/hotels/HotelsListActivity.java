@@ -1,13 +1,13 @@
 package com.example.dan.hotels;
 
 /*      TODO
-        (!) Утечки памяти - fised
+        (!) Утечки памяти - fixed
         При повороте экрана пропадает диалог выбора сортировки
-        По кол-ву свободных мест отели следовало сортировать в убывающем порядке
+        (!) По кол-ву свободных мест отели следовало сортировать в убывающем порядке - fixed
         (!)При клике на меню каждый раз создаётся диалог сортировки (у Activity есть методы showDialog/onCreateDialog) - fixed
         При сортировке пересоздаётся SimpleAdapter
-        CoordinatorLayout используется без необходимости
-        Подсчёт кол-ва свободных мест - ненадёжно и неинтуитивно
+        (!) CoordinatorLayout используется без необходимости - fixed
+        (!) Подсчёт кол-ва свободных мест - ненадёжно и неинтуитивно - fixed, написал пояснение в комментах
         Использование сторонних библиотек (?)*/
 
 
@@ -97,19 +97,20 @@ public class HotelsListActivity extends AppCompatActivity {
             sortBy = (SortBy)savedInstanceState.getSerializable("sort");
         }
 
-        if (hotels == null) {
+        if (downloadTask == null) {
             // Создаем новый таск
+            Log.w(TAG, "new JsonDownload task");
             downloadTask = new JSONDownloadTask(this);
             downloadTask.execute();
         } else {
             //Log.d(TAG, "Get task");
             // Передаем в ранее запущенный таск текущий объект Activity
             downloadTask.attachActivity(this);
-            if (hotels != null) {
-                inflateListView(hotels);
-            } else {
-                Log.e(TAG, "hotels = null in onCreate");
-            }
+        }
+        if (hotels != null) {
+            inflateListView(hotels);
+        } else {
+            Log.e(TAG, "hotels = null in onCreate");
         }
     }
 

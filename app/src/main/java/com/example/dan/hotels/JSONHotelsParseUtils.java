@@ -116,7 +116,14 @@ final class JSONHotelsParseUtils {
                 imgFile = reader.nextString();
             } else if (field.equals("suites_availability") && (reader.peek() != JsonToken.NULL)) {
                 String suites = reader.nextString();
-                int[] count = new int[20];
+                // Строка suites выглядит так: 22:11:1:3 - то есть свободные номера, разделенные двоеточием
+                //предподсчет строки - считаем, какие символы есть в строке
+                //count[%код символа%] - хранит число вхождений символа в строку
+                //наивная реализация работает за О(n+m), где m - количество двоеточий
+                //данная реализация работает за О(n)
+                //выбираем константу N = 20, так как код символов цифр и двоеточия < 20.
+                final int N = 20;
+                int[] count = new int[N];
                 for (int i = 0; i < suites.length(); i++) {
                     count[suites.charAt(i) - '0']++;
                 }
